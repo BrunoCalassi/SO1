@@ -1,0 +1,139 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package view;
+
+import controller.Controller;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author bruno
+ */
+public class Main {
+    public static void main(String[] args){
+        Controller cController =new Controller();  
+        int opc=0;
+        while(opc!=9){
+            opc=Integer.parseInt(JOptionPane.showInputDialog("Menu\n1-Sistema Operacional\n2-Lista de Processo\n3-Finalizar por PID\n4-Finalizar por Nome\n9-sair "));
+		switch(opc){
+                case 1:String os=cController.os();
+                       System.out.println(os);
+                        break;
+		case 2:cController.lista("TASKLIST /FO TABLE");
+                            break;
+                case 3:  String fim=JOptionPane.showInputDialog("Digite o PID");
+                         cController.finaliza(fim);
+                            break;
+                case 4 : String fimNome=JOptionPane.showInputDialog("Digite o nome");
+                         cController.finalizanome(fimNome);
+                            break;
+                case 9:
+			JOptionPane.showMessageDialog(null,"Saindo");
+			break;
+                default:
+			JOptionPane.showMessageDialog(null,"Opção inválida");
+         }
+        }
+    }
+}
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package controller;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author bruno
+ */
+public class Controller {
+    public String os(){
+        String os= System.getProperty("os.name");
+        return os;
+    }
+    public void lista(String process){
+        try {
+            Process p =Runtime.getRuntime().exec(process);
+            InputStream fluxo =p.getInputStream();
+            InputStreamReader leitor =new InputStreamReader(fluxo);
+            BufferedReader buffer = new BufferedReader(leitor);
+            String linha = buffer.readLine();
+            while(linha != null){
+                System.out.println(linha);
+                linha=buffer.readLine();
+            }
+            buffer.close();
+            leitor.close();
+            fluxo.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public void finaliza(String fim){
+         String cmdPid = "TASKKILL /PID";
+         int pid = 0 ;
+         StringBuffer buffer = new StringBuffer();
+         //NumberFormatException
+         try {
+             //TASKKILL /PID XXXX
+              pid=Integer.parseInt(fim);
+              buffer.append(cmdPid);
+              buffer.append(" ");
+              buffer.append(pid);
+         }catch(NumberFormatException e){
+           e.getStackTrace();
+         }
+         callProcesses(buffer.toString());
+    }
+    public void finalizanome(String fimnome){
+         String cmdNome = "TASKKILL /IM";
+         StringBuffer buffer = new StringBuffer();
+         //NumberFormatException
+         try {
+         //TASKKILL /IM NOMEDOPROCESSO.exe
+               buffer.append(cmdNome);
+             buffer.append(" ");
+             buffer.append(fimnome);
+         }catch(Exception e){
+             e.getStackTrace();
+         }
+         callProcesses(buffer.toString());
+    }
+    public void callProcesses(String process){
+        try {
+            Runtime.getRuntime().exec(process);
+        } catch (Exception e) {
+           String msgErro = e.getMessage();
+           //System.err.println(msgErro);
+           if (msgErro.contains("740")){
+               // cmd /c caminho_do_processo
+               StringBuffer buffer = new StringBuffer();
+               buffer.append("cmd /c ");
+               buffer.append(" ");
+               buffer.append(process);
+               try { 
+                   Runtime.getRuntime().exec(buffer.toString());
+               } catch (IOException ex) {
+                   ex.printStackTrace();
+               }
+           }else{
+               System.err.println(msgErro); 
+           }        
+        }
+    }
+}
+
+    
+
