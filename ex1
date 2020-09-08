@@ -12,7 +12,7 @@ public class Main {
         RedesController redeController =new RedesController();  
         int opc=0;
         while(opc!=9){
-            opc=Integer.parseInt(JOptionPane.showInputDialog("Cadastro\n1-Config de ip\n2-ping\n9-sair "));
+            opc=Integer.parseInt(JOptionPane.showInputDialog("Menu\n1-Config de ip\n2-ping\n9-sair "));
 		switch(opc){
 		case 1:redeController.ip();
                             break;
