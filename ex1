@@ -1,0 +1,88 @@
+package view;
+
+import controller.RedesController;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author bruno
+ */
+public class Main {
+    public static void main(String[] args){
+        RedesController redeController =new RedesController();  
+        int opc=0;
+        while(opc!=9){
+            opc=Integer.parseInt(JOptionPane.showInputDialog("Cadastro\n1-Config de ip\n2-ping\n9-sair "));
+		switch(opc){
+		case 1:redeController.ip();
+                            break;
+                case 2:  String process="PING  www.google.com.br";
+                         redeController.ping(process);
+                            break;
+                case 9:
+			JOptionPane.showMessageDialog(null,"Saindo");
+			break;
+                default:
+			JOptionPane.showMessageDialog(null,"Opção inválida");
+         }
+        }
+    }
+}
+
+
+package controller;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author bruno
+ */
+public class RedesController {
+    public void ip(){
+        String os= System.getProperty("os.name");   
+        try {
+            Process p =Runtime.getRuntime().exec("ipconfig");
+            InputStream fluxo =p.getInputStream();
+            InputStreamReader leitor =new InputStreamReader(fluxo);
+            BufferedReader buffer = new BufferedReader(leitor);
+            String linha = buffer.readLine();
+            while(linha != null){
+                if(linha.contains("Ethernet") || linha.contains("IPv4")){
+                    System.out.println(linha);
+                }
+                   linha=buffer.readLine();
+            }
+            buffer.close();
+            leitor.close();
+            fluxo.close();
+        } catch (IOException ex) {
+            Logger.getLogger(RedesController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public void ping(String process){
+        try {
+            Process p =Runtime.getRuntime().exec(process);
+            InputStream fluxo =p.getInputStream();
+            InputStreamReader leitor =new InputStreamReader(fluxo);
+            BufferedReader buffer = new BufferedReader(leitor);
+            String linha = buffer.readLine();
+            while(linha != null){
+               if(linha.contains("M�dia")){
+                    System.out.println(linha);
+                }
+                   linha=buffer.readLine();
+            }
+            buffer.close();
+            leitor.close();
+            fluxo.close();
+        } catch (IOException ex) {
+            Logger.getLogger(RedesController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
